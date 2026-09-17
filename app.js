@@ -20,7 +20,6 @@ const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         headless: true,
-        executablePath: chromePath,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
