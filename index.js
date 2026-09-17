@@ -1,27 +1,50 @@
 const { Client, LocalAuth } = require('whatsapp-web.js');
-const qrcode = require('qrcode-terminal');
+const express = require('express');
+const qrcode = require('qrcode');
+const http = require('http');
 
-// Inicializa el cliente usando una sesión local para no escanear el QR cada vez
+const app = express();
+const server = http.createServer(app);
+
+let qrCodeData = '';
+let clientStatus = 'Desconectado';
+
+// Inicializa WhatsApp Web
 const client = new Client({
-    authStrategy: new LocalAuth()
+    authStrategy: new LocalAuth(),
+    puppeteer: { args: ['--no-sandbox', '--disable-setuid-sandbox'] }
 });
 
-// Genera el código QR en la terminal para vincular el celular
 client.on('qr', (qr) => {
-    console.log('Escanea este código QR con tu celular:');
-    qrcode.generate(qr, { small: true });
+    // Convierte el código QR en una imagen para mostrarla en la web
+    qrcode.toDataURL(qr, (err, url) => {
+        qrCodeData = url;
+        clientStatus = 'Esperando escaneo de QR';
+    });
 });
 
-// Evento cuando se conecta correctamente
 client.on('ready', () => {
-    console.log('¡El bot de WhatsApp está conectado y listo!');
-});
-
-// Escuchar mensajes entrantes y responder automáticamente
-client.on('message', async msg => {
-    if (msg.body.toLowerCase() === 'hola') {
-        await msg.reply('¡Hola! Soy tu bot personalizado corriendo en Node.js.');
-    }
+    clientStatus = '¡Conectado y listo!';
+    qrCodeData = '';
 });
 
 client.initialize();
+
+// Ruta web para ver el estado y el QR desde tu navegador
+app.get('/', (req, res) => {
+    res.send(`
+        <html>
+            <head><title>Bot WhatsApp</title></head>
+            <body style="font-family: Arial; text-align: center; margin-top: 50px;">
+                <h1>Estado del Bot: ${clientStatus}</h1>
+                ${qrCodeData ? `<img src="${qrCodeData}" alt="Escanea este QR"/>` : '<p>Si ya está conectado, verás el estado arriba.</p>'}
+            </body>
+        </html>
+    `);
+});
+
+// El hosting asigna un puerto automático mediante process.env.PORT
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
