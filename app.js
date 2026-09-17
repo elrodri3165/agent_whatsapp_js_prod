@@ -9,7 +9,9 @@ const server = http.createServer(app);
 let qrCodeData = '';
 let clientStatus = 'Desconectado';
 
+const chromePath = puppeteer.executablePath();
 console.log('Chrome usado por Puppeteer:', chromePath);
+console.log('Chrome usado por Puppeteer(vieja):', process.env.CHROME_PATH);
 
 // Inicializa WhatsApp Web
 const client = new Client({
