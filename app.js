@@ -43,6 +43,23 @@ app.get('/', (req, res) => {
     `);
 });
 
+// Agregá esto antes de app.listen / server.listen
+app.use(express.json());
+
+app.post('/enviar-mensaje', async (req, res) => {
+    const { numero, mensaje } = req.body;
+    
+    // El formato que exige whatsapp-web.js para los números con característica (ej: Argentina +54 9...)
+    const chatId = numero.includes('@c.us') ? numero : `${numero}@c.us`;
+
+    try {
+        await client.sendMessage(chatId, mensaje);
+        res.status(200).json({ status: 'success', message: 'Mensaje enviado correctamente' });
+    } catch (error) {
+        res.status(500).json({ status: 'error', error: error.message });
+    }
+});
+
 // El hosting asigna un puerto automático mediante process.env.PORT
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
