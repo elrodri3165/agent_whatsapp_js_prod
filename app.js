@@ -12,14 +12,14 @@ let clientStatus = 'Desconectado';
 
 const chromePath = puppeteer.executablePath();
 console.log('Chrome usado por Puppeteer:', chromePath);
-console.log('Chrome usado por Puppeteer(vieja):', process.env.CHROME_PATH);
+console.log('Chrome usado por Puppeteer(vieja por gemini):', process.env.CHROME_PATH);
 
 // Inicializa WhatsApp Web
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         headless: true,
-        executablePath: process.env.CHROME_PATH || undefined,
+        executablePath: chromePath || undefined,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
