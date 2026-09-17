@@ -1,5 +1,6 @@
-const { Client, LocalAuth } = require('whatsapp-web.js');
+process.env.PUPPETEER_CACHE_DIR = '/home/u190405880/.cache/puppeteer';
 const puppeteer = require('puppeteer');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const express = require('express');
 const qrcode = require('qrcode');
 const http = require('http');
